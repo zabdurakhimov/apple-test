@@ -7,6 +7,7 @@ use backend\models\search\AppleSearch;
 use Yii;
 use backend\models\Apple;
 use backend\models\search\RegionSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -28,6 +29,15 @@ class AppleController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ]
         ];
     }
 
@@ -134,7 +144,12 @@ class AppleController extends Controller
 
     public function actionFall($id)
     {
-        $this->findModel($id)->fallToGround();
+        $apple = Apple::findOne($id);
+        if ($apple->status != Apple::STATUS_ON_GROUND) {
+            $this->findModel($id)->fallToGround();
+        }else{
+            Yii::$app->session->setFlash('error', "it is on the ground already!");
+        }
 
         return $this->redirect(Yii::$app->request->referrer ?: ['index']);
     }
