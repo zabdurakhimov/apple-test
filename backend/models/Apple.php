@@ -11,12 +11,24 @@ use Yii;
  * @property string $color
  * @property int $status
  * @property double $size
- * @property string $fallen_at
- * @property string $created_at
- * @property string $deleted_at
+ * @property integer $fallen_at
+ * @property integer $created_at
+ * @property integer $deleted_at
  */
 class Apple extends \yii\db\ActiveRecord
 {
+    const STATUS_ON_TREE = 10;
+    const STATUS_ON_GROUND = 20;
+    const STATUS_ROTTEN = 30;
+
+    public function __construct($color = null, $config = [])
+    {
+        parent::__construct($config);
+        if ($color !== null) {
+            $this->color = $color;
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -32,10 +44,12 @@ class Apple extends \yii\db\ActiveRecord
     {
         return [
             [['color'], 'required'],
-            [['color'], 'default', 'value'=> '#' . dechex(rand(0,10000000))],
+            [['created_at'], 'default', 'value' => rand(1000000000, 2000000000)],
+            [['size'], 'default', 'value' => 1],
+            [['status'], 'default', 'value' => self::STATUS_ON_TREE],
             [['status'], 'integer'],
             [['size'], 'number'],
-            [['fallen_at', 'created_at', 'deleted_at'], 'safe'],
+            [['fallen_at', 'created_at', 'deleted_at'], 'integer'],
             [['color'], 'string', 'max' => 24],
         ];
     }
@@ -52,7 +66,49 @@ class Apple extends \yii\db\ActiveRecord
             'size' => 'Size',
             'fallen_at' => 'Fallen At',
             'created_at' => 'Created At',
-            'deleted_at' => 'Deleted At',
+            'deleted_at' => 'Removed At',
+        ];
+    }
+
+    public function fallToGround()
+    {
+        $this->status = self::STATUS_ON_GROUND;
+        $this->fallen_at = time();
+        $this->save();
+    }
+
+    public function eat($percent)
+    {
+        $this->size = $this->size - $percent / 100;
+        $this->save();
+    }
+
+    public function remove()
+    {
+        $this->deleted_at = time();
+        $this->save();
+    }
+
+    public function createRandom()
+    {
+        $apple = new Apple('#' . dechex(rand(1000000, 10000000)));
+        $apple->save();
+    }
+
+    public function getStatusLabel()
+    {
+        $labels = self::labels();
+        if (isset($labels[$this->status])) {
+            return $labels[$this->status];
+        }
+    }
+
+    public static function labels()
+    {
+        return [
+            self::STATUS_ON_TREE => 'ON TREE',
+            self::STATUS_ON_GROUND => 'ON THE GROUND',
+            self::STATUS_ROTTEN => 'ROTTEN',
         ];
     }
 }

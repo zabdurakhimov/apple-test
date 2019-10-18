@@ -17,9 +17,9 @@ class m191017_132025_apple_table extends Migration
             'color' => $this->string(24)->notNull(),
             'status' => $this->integer(),
             'size' => $this->double(),
-            'fallen_at' => $this->timestamp(),
-            'created_at' => $this->timestamp(),
-            'deleted_at' => $this->timestamp(),
+            'fallen_at' => $this->integer(8),
+            'created_at' => $this->integer(8),
+            'deleted_at' => $this->integer(8),
         ]);
     }
 

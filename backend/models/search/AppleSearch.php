@@ -9,8 +9,9 @@ use backend\models\Apple;
 /**
  * RegionSearch represents the model behind the search form of `backend\models\Apple`.
  */
-class RegionSearch extends Apple
+class AppleSearch extends Apple
 {
+    public $active;
     /**
      * {@inheritdoc}
      */
@@ -18,7 +19,7 @@ class RegionSearch extends Apple
     {
         return [
             [['id', 'status'], 'integer'],
-            [['color', 'fallen_at', 'created_at', 'deleted_at'], 'safe'],
+            [['color', 'fallen_at', 'created_at', 'deleted_at', 'active'], 'safe'],
             [['size'], 'number'],
         ];
     }
@@ -66,6 +67,12 @@ class RegionSearch extends Apple
             'created_at' => $this->created_at,
             'deleted_at' => $this->deleted_at,
         ]);
+
+        if ($this->active) {
+            $query->andWhere(['deleted_at' => null]);
+        } else {
+            $query->andWhere(['not', ['deleted_at' => null]]);
+        }
 
         $query->andFilterWhere(['like', 'color', $this->color]);
 
