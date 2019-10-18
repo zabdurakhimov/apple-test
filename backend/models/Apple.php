@@ -89,6 +89,12 @@ class Apple extends \yii\db\ActiveRecord
         $this->save();
     }
 
+    public function rotten()
+    {
+        $this->status = self::STATUS_ROTTEN;
+        $this->save();
+    }
+
     public function createRandom()
     {
         $apple = new Apple('#' . dechex(rand(1000000, 10000000)));
